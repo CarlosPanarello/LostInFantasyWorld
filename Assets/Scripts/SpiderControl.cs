@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.ComponentModel;
 
 public class SpiderControl : MonoBehaviour {
 
@@ -12,94 +13,128 @@ public class SpiderControl : MonoBehaviour {
     public LevelManager level;
 
     private bool ativo;
+	private bool hit;
+	private bool isVisible;
     private Rigidbody2D meuRigibody;
     private Animator animacao;
 
     private Vector3 pontoFinal;
     private Vector3 pontoInicio;
-    private Vector3 alvoAtual;
+	private Vector3 alvoAtualFixo;
 
     // Use this for initialization
     void Start() {
         meuRigibody = GetComponent<Rigidbody2D>();
         animacao = GetComponent<Animator>();
         
-        ativo = false;
+		ativo = false;
+		isVisible = false; 
+		hit = false;
 
 		pontoInicio = new Vector3(inicio.position.x, transform.position.y, transform.position.z);
         pontoFinal = new Vector3(fim.position.x, transform.position.y, transform.position.z);
-        alvoAtual = pontoFinal;
+        alvoAtualFixo = pontoFinal;
     }
 
     private void movimentarModoPatrulha() {
-
-        meuRigibody.velocity =
-        Vector3.MoveTowards(transform.position, alvoAtual, moveSpeed * Time.deltaTime);
-
-        if (transform.position.x == pontoFinal.x) {
-            transform.localScale = new Vector3(-1f, 1f, 1f);
-            alvoAtual = pontoInicio;
-        }
-
-        if (transform.position.x == pontoInicio.x) {
-            transform.localScale = new Vector3(1f, 1f, 1f);
-            alvoAtual = pontoFinal;
-        }
-    }
-
-    private void movimentarModePersiguicao() {
-        float posicaoX = level.posicaoJogadorAtivo().x;
-
-        if (posicaoX>0) {
-            transform.localScale = new Vector3(-1f, 1f, 1f);
-        } else {
-            transform.localScale = new Vector3(1f, 1f, 1f);
-        }
-
-        Vector3 alvoPerseguir = new Vector3(posicaoX, transform.position.y, transform.position.z);
-        meuRigibody.velocity = Vector3.MoveTowards(transform.position, alvoPerseguir, moveSpeed * Time.deltaTime);
-    }
-
-    private void movimentarParaDireita() {
-        meuRigibody.velocity = new Vector3(moveSpeed * Time.deltaTime, meuRigibody.velocity.y, 0f);
-        transform.localScale = new Vector3(-1f, 1f, 1f);
-    }
-
-    private void movimentarParaEsquerda() {
-        meuRigibody.velocity = new Vector3(-(moveSpeed * Time.deltaTime), meuRigibody.velocity.y, 0f);
-        transform.localScale = new Vector3(1f, 1f, 1f);
-    }
-
-    // Update is called once per frame
-    void Update() {
-        
         if (ativo) {
-            switch (tipoMovimento) {
-                case Global.tipoMovimentacaoInimigo.IrDireita:
-                    movimentarParaDireita();
-                    break;
-                case Global.tipoMovimentacaoInimigo.IrEsquerda:
-                    movimentarParaEsquerda();
-                    break;
-                case Global.tipoMovimentacaoInimigo.Perseguir:
-                    movimentarModePersiguicao();
-                    break;
-                case Global.tipoMovimentacaoInimigo.Patrulha:
-                    movimentarModoPatrulha();
-                    break;
-                default:
-                    break;
+            if (transform.position.x <= pontoFinal.x && meuRigibody.velocity.x < 0) {
+                transform.localScale = new Vector3(-1f, 1f, 1f);
+                alvoAtualFixo = pontoInicio;
+            }
+
+            if (transform.position.x >= pontoInicio.x && meuRigibody.velocity.x > 0) {
+                transform.localScale = new Vector3(1f, 1f, 1f);
+                alvoAtualFixo = pontoFinal;
+            }
+
+            if (alvoAtualFixo.x < transform.position.x) {
+                meuRigibody.velocity = new Vector3(-moveSpeed, meuRigibody.velocity.y, 0f);
+                //Vector3.MoveTowards (transform.position, alvoAtual, moveSpeed * Time.deltaTime);	
+            } else {
+                meuRigibody.velocity = new Vector3(moveSpeed, meuRigibody.velocity.y, 0f);
             }
         }
     }
 
-    public void OnBecameInvisible() {
+    private void movimentarModePersiguicao() {
+		Vector3 alvoAtualMovel = level.posicaoJogadorAtivo ();
+
+        // o Player esta na mesma posicao do inimigo no eixo x
+        float dif = Mathf.Abs(alvoAtualMovel.x - transform.position.x);
+        ativo = !(dif > 0 && dif < 1) ;
+
+        if (ativo) {
+            // o Player esta a direita
+            if ((alvoAtualMovel.x - transform.position.x) > 0) {
+                // vai realizar a transformacao se ele nao estiver na posicao correta
+                if (transform.localScale.x > 0) {
+                    transform.localScale = new Vector3(-1f, 1f, 1f);
+                }
+                meuRigibody.velocity = new Vector3(moveSpeed, meuRigibody.velocity.y, 0f);
+            }
+
+            // o Player esta a esquerda
+            if ((alvoAtualMovel.x - transform.position.x) < 0) {
+                // vai realizar a transformacao se ele nao estiver na posicao correta
+                if (transform.localScale.x < 0) {
+                    transform.localScale = new Vector3(1f, 1f, 1f);
+                }
+                meuRigibody.velocity = new Vector3(-moveSpeed, meuRigibody.velocity.y, 0f);
+            }
+        } else {
+            //Forca a parada
+            meuRigibody.velocity = new Vector3(0, meuRigibody.velocity.y, 0f);
+        }
 
     }
 
+    private void movimentarParaDireita() {
+        if (ativo) {
+            meuRigibody.velocity = new Vector3(moveSpeed, meuRigibody.velocity.y, 0f);
+            transform.localScale = new Vector3(-1f, 1f, 1f);
+        }
+    }
+
+    private void movimentarParaEsquerda() {
+        if (ativo) {
+            meuRigibody.velocity = new Vector3(-moveSpeed, meuRigibody.velocity.y, 0f);
+            transform.localScale = new Vector3(1f, 1f, 1f);
+        }
+    }
+
+    // Update is called once per frame
+    void Update() {
+        switch (tipoMovimento) {
+            case Global.tipoMovimentacaoInimigo.IrDireita:
+                movimentarParaDireita();
+                break;
+            case Global.tipoMovimentacaoInimigo.IrEsquerda:
+                movimentarParaEsquerda();
+                break;
+            case Global.tipoMovimentacaoInimigo.Perseguir:
+                movimentarModePersiguicao();
+                break;
+            case Global.tipoMovimentacaoInimigo.Patrulha:
+                movimentarModoPatrulha();
+                break;
+            default:
+                break;
+        }
+
+        animacao.SetFloat("speed", Mathf.Abs(meuRigibody.velocity.x));
+        animacao.SetBool("hit", hit);
+    }
+
+    public void OnBecameInvisible() {
+		isVisible = false;
+    }
+
     public void OnBecameVisible() {
-        ativo = true;
-        animacao.SetBool("ativo", true);
-        animacao.SetBool("hit", false);
+		if (!isVisible) {
+			ativo = true;
+			hit = false;
+			isVisible = true;
+		}
     }
 }

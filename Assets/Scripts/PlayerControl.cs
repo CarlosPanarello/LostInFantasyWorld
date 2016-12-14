@@ -14,7 +14,7 @@ public class PlayerControl : MonoBehaviour {
     public bool isAtivo;
 
     public Transform groundCheck;
-	public float groundCheckRadius;
+    public float groundCheckRadius;
 
     public bool isGrounded;
     public bool isSwinning;
@@ -25,6 +25,8 @@ public class PlayerControl : MonoBehaviour {
     public bool canWalkInLava;
 
     public Vector3 respawnPosition;
+
+    public GameObject stompBox;
 
 	public LevelManager level;
 
@@ -52,7 +54,7 @@ public class PlayerControl : MonoBehaviour {
         jogadorParado = true;
         meuRigibody.isKinematic = true;
         inPlataformaMovel = false;
-    }
+     }
 
 	void FixedUpdate(){
     	if (actionSwin && isAtivo) {
@@ -129,6 +131,14 @@ public class PlayerControl : MonoBehaviour {
             // Se nao tiver ativo ele pode estar parado no ar 
             // entao devo deixar ele cair ate encontrar alguma coisa.
             congelarJogador();
+        }
+
+        if(meuRigibody.velocity.y < 0 ) {
+            stompBox.SetActive(true);
+        } else {
+            if (stompBox != null) {
+                stompBox.SetActive(false);
+            }
         }
 
         meuAnim.SetBool("Hurting", executandoDano);
