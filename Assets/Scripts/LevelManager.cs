@@ -237,7 +237,7 @@ public class LevelManager : MonoBehaviour {
 	}
 
 	public void AdicionarVida(int qtd){
-		jogador_ativo.vida = jogador_ativo.vida + qtd;
+		jogador_ativo.contadorVida = jogador_ativo.contadorVida + qtd;
 	}
 	
 	
