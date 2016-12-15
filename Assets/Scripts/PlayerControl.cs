@@ -41,6 +41,13 @@ public class PlayerControl : MonoBehaviour {
     public bool executandoDano;
     private bool jogadorParado;
 
+
+
+    public float knockbackForce;
+    public float knockbackLength;
+    public float knockbackCounter;
+
+
     // Use this for initialization
     void Start () {
 		//moveSpeed = 1f;
@@ -73,6 +80,12 @@ public class PlayerControl : MonoBehaviour {
         if (!executandoDano) {
             StartCoroutine("ResetarAnimHurt", dano);
         }
+    }
+
+    public void HurtPlayerWithKnockback(int dano) {
+        contadorVida -= dano;
+        ferirSom.Play();
+        this.knockbackAction();
     }
 
     private IEnumerator ResetarAnimHurt(int dano) {
@@ -109,29 +122,42 @@ public class PlayerControl : MonoBehaviour {
         }
 
         if (isAtivo) {
-            if (Input.GetButtonDown("Fire1") && isSwinning && canSwim) {
-                actionSwin = true;
-            }
 
-            if (Input.GetAxisRaw("Horizontal") > 0f) {
-                meuRigibody.velocity = new Vector3(moveSpeed, meuRigibody.velocity.y, 0f);
-                transform.localScale = new Vector3(1f, 1f, 1f);
-            } else if (Input.GetAxisRaw("Horizontal") < 0f) {
-                meuRigibody.velocity = new Vector3(-moveSpeed, meuRigibody.velocity.y, 0f);
-                transform.localScale = new Vector3(-1f, 1f, 1f);
+            if (knockbackCounter <= 0) {
+                if (Input.GetButtonDown("Fire1") && isSwinning && canSwim) {
+                    actionSwin = true;
+                }
+
+                if (Input.GetAxisRaw("Horizontal") > 0f) {
+                    meuRigibody.velocity = new Vector3(moveSpeed, meuRigibody.velocity.y, 0f);
+                    transform.localScale = new Vector3(1f, 1f, 1f);
+                } else if (Input.GetAxisRaw("Horizontal") < 0f) {
+                    meuRigibody.velocity = new Vector3(-moveSpeed, meuRigibody.velocity.y, 0f);
+                    transform.localScale = new Vector3(-1f, 1f, 1f);
+                } else {
+                    meuRigibody.velocity = new Vector3(0f, meuRigibody.velocity.y, 0f);
+                }
+
+                if (Input.GetButtonDown("Jump") && isGrounded) {
+                    meuRigibody.velocity = new Vector3(meuRigibody.velocity.x, jumpSpeed, 0f);
+                    jumpSound.Play();
+                }
             } else {
-                meuRigibody.velocity = new Vector3(0f, meuRigibody.velocity.y, 0f);
-            }
+                knockbackCounter -= Time.deltaTime;
 
-            if (Input.GetButtonDown("Jump") && isGrounded) {
-                meuRigibody.velocity = new Vector3(meuRigibody.velocity.x, jumpSpeed, 0f);
-                jumpSound.Play();
+                if(transform.localScale.x > 0) {
+                    meuRigibody.velocity = new Vector3(-knockbackForce, knockbackForce, 0f);
+                } else {
+                    meuRigibody.velocity = new Vector3(knockbackForce, knockbackForce, 0f);
+                }
             }
         } else {
             // Se nao tiver ativo ele pode estar parado no ar 
             // entao devo deixar ele cair ate encontrar alguma coisa.
             congelarJogador();
         }
+
+
 
         if(meuRigibody.velocity.y < 0 ) {
             stompBox.SetActive(true);
@@ -146,6 +172,10 @@ public class PlayerControl : MonoBehaviour {
         meuAnim.SetBool("Grounded", isGrounded);
         meuAnim.SetBool("Swimming", isSwinning);
 	}
+
+    public void knockbackAction() {
+        knockbackCounter = knockbackLength;
+    }
 
     private void congelarJogador() {
        if ((isSwinning || isGrounded || isLavaGrounded) && !jogadorParado && !inPlataformaMovel) {

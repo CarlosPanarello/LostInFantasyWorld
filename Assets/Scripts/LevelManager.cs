@@ -45,13 +45,17 @@ public class LevelManager : MonoBehaviour {
     private PlayerControl jogador_ativo;
     private List<PlayerControl> listaJogadores;
 
+    private ResetOnRespawn[] objetosParaResetar;
+
     // Use this for initialization
     void Start() {
         inicializarListaJogaresPossiveis();
         cameraPrincipal = FindObjectOfType<CameraControl>();
         cameraPrincipal.posicionarCameraAlvo(jogador_ativo.gameObject);
         ajusteSom(volumeSFX, volumeMusic);
-       // moedaText.text = "Coins: " + contadorMoeda.ToString();
+        // moedaText.text = "Coins: " + contadorMoeda.ToString();
+
+        objetosParaResetar = FindObjectsOfType<ResetOnRespawn>();
     }
 
     private void ajusteSom(int sfx,int music) {
@@ -186,7 +190,14 @@ public class LevelManager : MonoBehaviour {
 
         jogadorRespaw.renascendo = false;
 
-		//UpdateCoracao ();
+        //UpdateCoracao ();
+
+        // Resetando as moedas e iniciando objetos;
+        contadorMoeda = 0;
+        foreach (ResetOnRespawn objeto in objetosParaResetar) {
+            objeto.gameObject.SetActive(true);
+            objeto.ResetObject();
+        }
 
 	}
 

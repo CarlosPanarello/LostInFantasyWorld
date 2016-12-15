@@ -137,4 +137,16 @@ public class SpiderControl : MonoBehaviour {
 			isVisible = true;
 		}
     }
+
+    void OnTriggerEnter2D(Collider2D other) {
+        if(other.tag == "KillPlane" || other.tag == "Water" || other.tag == "Spikes") {
+            //Destroy(gameObject);
+            gameObject.SetActive(false);
+        }
+    }
+
+    void OnEnable() {
+        ativo = false;
+    }
+
 }

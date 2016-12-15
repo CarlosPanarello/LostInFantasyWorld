@@ -26,7 +26,7 @@ public class ResetOnRespawn : MonoBehaviour {
 	    
 	}
 
-    public void Reset() {
+    public void ResetObject() {
         transform.position = startPosition;
         transform.rotation = startRotation;
         transform.localScale = startLocalScale;
