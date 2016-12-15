@@ -236,6 +236,11 @@ public class LevelManager : MonoBehaviour {
 		//UpdateCoracao ();
 	}
 
+	public void AdicionarVida(int qtd){
+		jogador_ativo.vida = jogador_ativo.vida + qtd;
+	}
+	
+	
 	public void UpdateCoracao(){
 		switch (jogador_ativo.contadorVida) {
 		case 6:
