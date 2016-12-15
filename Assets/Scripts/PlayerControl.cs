@@ -9,6 +9,7 @@ public class PlayerControl : MonoBehaviour {
     public float swimSpeed;
     public Global.tipoPlayer tipo;
         
+    public int contadorCoracao;
     public int contadorVida;
 
     public bool isAtivo;
@@ -70,9 +71,9 @@ public class PlayerControl : MonoBehaviour {
 		}
 	}
 
-    public void Respawing(int vidaMaxima) {
+    public void Respawing(int coracoesMaximo) {
         executandoDano = false;
-        contadorVida = vidaMaxima;
+        contadorCoracao = coracoesMaximo;
         transform.position = respawnPosition;
     }
 
@@ -83,14 +84,14 @@ public class PlayerControl : MonoBehaviour {
     }
 
     public void HurtPlayerWithKnockback(int dano) {
-        contadorVida -= dano;
+        contadorCoracao -= dano;
         ferirSom.Play();
         this.knockbackAction();
     }
 
     private IEnumerator ResetarAnimHurt(int dano) {
         executandoDano = true;
-        contadorVida -= dano;
+        contadorCoracao -= dano;
         ferirSom.Play();
         yield return new WaitForSeconds(0.5f);
         executandoDano = false;
