@@ -1,0 +1,27 @@
+using UnityEngine;
+using System.Collections;
+
+public class VidaExtra : MonoBehaviour {
+
+	private LevelManager level;
+	public int vidasAdicionar;
+    public Global.tipoPlayer tipoJogador;
+
+
+	// Use this for initialization
+	void Start () {
+		level = FindObjectOfType<LevelManager>();
+	}
+	
+	// Update is called once per frame
+	void Update () {
+	
+	}
+
+    void OnTriggerEnter2D(Collider2D outro){
+        if(tipoPlayer.equals(Global.obterPorDescricao(outro.tag)){
+            level.AdicionarVida(vidasAdicionar);
+        }
+    }
+
+}
