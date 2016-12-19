@@ -5,7 +5,7 @@ using System.ComponentModel;
 public class SpiderControl : MonoBehaviour {
 
     public float moveSpeed;
-    public Global.tipoMovimentacaoInimigo tipoMovimento;
+    public Global.typeOfMovementEnemy tipoMovimento;
 
     public Transform fim;
 	public Transform inicio;
@@ -106,16 +106,16 @@ public class SpiderControl : MonoBehaviour {
     // Update is called once per frame
     void Update() {
         switch (tipoMovimento) {
-            case Global.tipoMovimentacaoInimigo.IrDireita:
+            case Global.typeOfMovementEnemy.IrDireita:
                 movimentarParaDireita();
                 break;
-            case Global.tipoMovimentacaoInimigo.IrEsquerda:
+            case Global.typeOfMovementEnemy.IrEsquerda:
                 movimentarParaEsquerda();
                 break;
-            case Global.tipoMovimentacaoInimigo.Perseguir:
+            case Global.typeOfMovementEnemy.Perseguir:
                 movimentarModePersiguicao();
                 break;
-            case Global.tipoMovimentacaoInimigo.Patrulha:
+            case Global.typeOfMovementEnemy.Patrulha:
                 movimentarModoPatrulha();
                 break;
             default:

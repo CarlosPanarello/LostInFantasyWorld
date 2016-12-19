@@ -17,8 +17,6 @@ public class ResetOnRespawn : MonoBehaviour {
         if (GetComponent<Rigidbody2D>() != null) {
             meuRigidBody = GetComponent<Rigidbody2D>();
         }
-
-
     }
 	
 	// Update is called once per frame

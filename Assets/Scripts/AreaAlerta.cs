@@ -39,16 +39,16 @@ public class AreaAlerta : MonoBehaviour {
 
 
     void OnTriggerStay2D(Collider2D outro) {
-        Global.tipoPlayer tipo = Global.obterPorDescricao(outro.tag);
-        if(!tipo.Equals(Global.tipoPlayer.Player_None)) {
+        Global.typeOfPlayer tipo = Global.getTypeOfPlayerByTag(outro.tag);
+        if(!tipo.Equals(Global.typeOfPlayer.Player_None)) {
             startMovimento();
             
         }
     }
 
      void OnTriggerExit2D(Collider2D outro) {
-        Global.tipoPlayer tipo = Global.obterPorDescricao(outro.tag);
-        if (!tipo.Equals(Global.tipoPlayer.Player_None)) {
+        Global.typeOfPlayer tipo = Global.getTypeOfPlayerByTag(outro.tag);
+        if (!tipo.Equals(Global.typeOfPlayer.Player_None)) {
             StartCoroutine("PararEm2Segudos");
         }
     }
