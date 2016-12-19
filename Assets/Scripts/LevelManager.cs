@@ -119,13 +119,14 @@ public class LevelManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-
+        /*
         foreach (PlayerControl player in listOfPlayers) {
             if (player.contadorVida <= 0 && !player.renascendo) {
                 player.renascendo = true;
                 Respawn(player);
             }
         }
+        */
 	}
 
 	public void Respawn(PlayerControl jogadorRespaw){
@@ -144,7 +145,7 @@ public class LevelManager : MonoBehaviour {
         
         yield return new WaitForSeconds (tempoEsperaRespawn);
 
-        jogadorRespaw.Respawing(vidaMaxima);
+        //jogadorRespaw.Respawing(vidaMaxima);
 
         jogadorRespaw.gameObject.SetActive (true);
 

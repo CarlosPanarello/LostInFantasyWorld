@@ -9,13 +9,43 @@ public class CollectiablesController : MonoBehaviour {
     public Global.typeOfItem item;
 
     public int valueOfItem;
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
+
+    public bool canRespaw;
+
+    private Vector3 startPosition;
+    private Quaternion startRotation;
+    private Vector3 startLocalScale;
+    private Rigidbody2D body;
+    private Global.typeOfPlayer typeOfPlayerThatCatchItem;
+
+    void Awake() {
+        //TODO colocar um alerta para qdo for respaw
+    }
+
+
+    // Use this for initialization
+    void Start() {
+        startPosition = transform.position;
+        startRotation = transform.rotation;
+        startLocalScale = transform.localScale;
+
+        if (GetComponent<Rigidbody2D>() != null) {
+            body = GetComponent<Rigidbody2D>();
+        }
+    }
+
+    public void ResetObject() {
+        transform.position = startPosition;
+        transform.rotation = startRotation;
+        transform.localScale = startLocalScale;
+
+        if (body != null) {
+            body.velocity = Vector3.zero;
+        }
+    }
+
+    // Update is called once per frame
+    void Update () {
 	
 	}
 
@@ -29,14 +59,17 @@ public class CollectiablesController : MonoBehaviour {
                 case Global.typeOfPlayer.Player_None:
                     break;
                 default:
+                    typeOfPlayerThatCatchItem = player;
                     if (OnItemCollect != null) { 
                         OnItemCollect(valueOfItem, player, item);
                     }
+
+                    //TODO verificar se como fica o delagate das classes pressas a ele
+                    //Destroy (gameObject);
+                    gameObject.SetActive(false);
                     break;
             }
-            //TODO verificar se como fica o delagate das classes pressas a ele
-            //Destroy (gameObject);
-            gameObject.SetActive(false);
+
         }
     }
 }
