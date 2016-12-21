@@ -5,7 +5,9 @@ using System.Collections.Generic;
 
 public class LevelManager : MonoBehaviour {
 
-	public float tempoEsperaRespawn;
+    public static LevelManager instance;
+
+    public float tempoEsperaRespawn;
 
 	public PlayerControl jogador_Green;
 	public PlayerControl jogador_Bege;
@@ -19,20 +21,25 @@ public class LevelManager : MonoBehaviour {
 
 	public GameObject explosao;
 
-    private ResetOnRespawn[] objetosParaResetar;
-
     //Novos Metodos
     public bool canRespaw;
     private List<PlayerControl> listOfPlayers;
     private PlayerControl playerActive;
 
-    public delegate void LevelActions(IPlayerAction action);
+    public delegate void LevelActions(IPlayerAction action,Global.typeOfPlayer tipoPlayer);
     public static event LevelActions OnLevelAction;
 
-    public delegate void LevelPlayerRespaw(int coins);
+    public delegate void LevelPlayerRespaw(Global.typeOfPlayer player);
     public static event LevelPlayerRespaw OnRespaw;
 
+    void MakeInstance() {
+        if (instance == null) {
+            instance = this;
+        }
+    }
+
     void Awake() {
+        MakeInstance();
         InputController.OnPlayerAction += actionController;
         ScoreController.OnHealthGoesToZero += playerDies;
     }
@@ -42,18 +49,25 @@ public class LevelManager : MonoBehaviour {
             if (scriptPlayer.tipo.Equals(player)) {
 
                 if (canRespaw) {
-
-                    OnRespaw(0);
+                    OnRespaw( player);
                 }
-
             }
         }
     }
 
     private void actionController(IPlayerAction action) {
         if (action.changePlayer(listOfPlayers)) {
+            Global.typeOfPlayer type = Global.typeOfPlayer.Player_None;
+
+            foreach (PlayerControl player in listOfPlayers) {
+                if (player.isAtivo) {
+                    type = player.tipo;
+                    break;
+                }
+            }
+
             if (OnLevelAction != null) { 
-                OnLevelAction(new ActionChangePlayer());
+                OnLevelAction(new ActionChangePlayer(),type);
             }
         }
     }
@@ -154,10 +168,16 @@ public class LevelManager : MonoBehaviour {
         //UpdateCoracao ();
 
         // Resetando as moedas e iniciando objetos;
+        /*
         foreach (ResetOnRespawn objeto in objetosParaResetar) {
             objeto.gameObject.SetActive(true);
             objeto.ResetObject();
         }
+        */
 
 	}
+
+    public Vector3 posicaoJogadorAtivo() {
+        return playerActive.transform.position;
+    }
 }

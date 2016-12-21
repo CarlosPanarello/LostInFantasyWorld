@@ -1,12 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public class CollectiablesController : MonoBehaviour {
 
-    public delegate void ItemCollect(int valueOfItem, Global.typeOfPlayer player , Global.typeOfItem item);
+    public delegate void ItemCollect(int valueOfItem, 
+        Global.typeOfPlayer player ,
+        CollectiablesController item);
     public static event ItemCollect OnItemCollect;
 
-    public Global.typeOfItem item;
+    public Global.typeOfItem typeOfItem;
 
     public int valueOfItem;
 
@@ -20,8 +23,16 @@ public class CollectiablesController : MonoBehaviour {
 
     void Awake() {
         //TODO colocar um alerta para qdo for respaw
+        LevelManager.OnRespaw += respawCollectibles;
     }
 
+    private void respawCollectibles( Global.typeOfPlayer player) {
+        if (!this.gameObject.activeSelf && canRespaw 
+            && typeOfPlayerThatCatchItem.Equals(player) ) {
+            this.gameObject.SetActive(true);
+            this.ResetObject();
+        }
+    }
 
     // Use this for initialization
     void Start() {
@@ -61,7 +72,7 @@ public class CollectiablesController : MonoBehaviour {
                 default:
                     typeOfPlayerThatCatchItem = player;
                     if (OnItemCollect != null) { 
-                        OnItemCollect(valueOfItem, player, item);
+                        OnItemCollect(valueOfItem, player, this);
                     }
 
                     //TODO verificar se como fica o delagate das classes pressas a ele
@@ -69,7 +80,6 @@ public class CollectiablesController : MonoBehaviour {
                     gameObject.SetActive(false);
                     break;
             }
-
         }
     }
 }

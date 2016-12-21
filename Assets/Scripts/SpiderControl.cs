@@ -9,8 +9,6 @@ public class SpiderControl : MonoBehaviour {
 
     public Transform fim;
 	public Transform inicio;
-    
-    public LevelManager level;
 
     private bool ativo;
 	private bool hit;
@@ -57,9 +55,7 @@ public class SpiderControl : MonoBehaviour {
         }
     }
 
-    private void movimentarModePersiguicao() {
-		Vector3 alvoAtualMovel = level.posicaoJogadorAtivo ();
-
+    private void movimentarModePersiguicao(Vector3 alvoAtualMovel) {
         // o Player esta na mesma posicao do inimigo no eixo x
         float dif = Mathf.Abs(alvoAtualMovel.x - transform.position.x);
         ativo = !(dif > 0 && dif < 1) ;
@@ -113,7 +109,7 @@ public class SpiderControl : MonoBehaviour {
                 movimentarParaEsquerda();
                 break;
             case Global.typeOfMovementEnemy.Perseguir:
-                movimentarModePersiguicao();
+                movimentarModePersiguicao(LevelManager.instance.posicaoJogadorAtivo());
                 break;
             case Global.typeOfMovementEnemy.Patrulha:
                 movimentarModoPatrulha();

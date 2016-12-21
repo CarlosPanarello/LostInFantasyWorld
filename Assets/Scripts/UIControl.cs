@@ -98,10 +98,14 @@ public class UIControl : MonoBehaviour {
         HurtPlayer.OnHurtPlayer += updateHearthDamage;
         CollectiablesController.OnItemCollect += catchItem;
         LevelManager.OnLevelAction += changedPlayer;
+        
     }
 
-    private void changedPlayer(IPlayerAction action) {
+    private void changedPlayer(IPlayerAction action,Global.typeOfPlayer type) {
         action.changedPlayer(botaoMudarJogador,playerAtivo);
+        hearths = ScoreController.instance.getCurrentHealthFromPlayer(type);
+        currentHealth = ScoreController.instance.getHearthsFromPlayer(type);
+        updateHealthShow();
     }
 
     void MakeInstance() {
@@ -109,49 +113,6 @@ public class UIControl : MonoBehaviour {
             inicializarItens();
             instance = this;
         }
-    }
-
-    public void clickConfig() {
-
-    }
-
-    public void clickPausarJogo() {
-        Time.timeScale = 0f;
-        //Colocar o menu do jogo Ativo
-        //pausePanel.SetActive(true);
-        botaoPausaStart.image.sprite = s_start;
-    }
-
-    public void clickResumeJogo() {
-        Time.timeScale = 1f;
-        //Colocar o menu do jogo desativado
-        //pausePanel.SetActive(false);
-        botaoPausaStart.image.sprite = s_pause ;
-    }
-
-    public void clickSairJogo() {
-        Time.timeScale = 1f;
-        // Application.LoadLevel("MainMenu");
-    }
-
-    public void clickIrEsquerda() {
-
-    }
-
-    public void clickIrDireita() {
-
-    }
-
-    public void clickMudarJogador() {
-
-    }
-
-    public void clickAcaoPulo() {
-
-    }
-
-    public void clickAcaoEspecial() {
-
     }
 
     //##########################################################################################################
@@ -261,8 +222,8 @@ public class UIControl : MonoBehaviour {
     }
 
     //Metodos Privados
-    private void catchItem(int add, Global.typeOfPlayer player, Global.typeOfItem item) {
-        switch (item) {
+    private void catchItem(int add, Global.typeOfPlayer player,CollectiablesController item) {
+        switch (item.typeOfItem) {
             case Global.typeOfItem.Gem_Blue:
                 gema_azul.gameObject.SetActive(true);
                 gema_azul.sprite = s_gema_azul;
