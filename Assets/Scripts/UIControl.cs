@@ -98,7 +98,17 @@ public class UIControl : MonoBehaviour {
         HurtPlayer.OnHurtPlayer += updateHearthDamage;
         CollectiablesController.OnItemCollect += catchItem;
         LevelManager.OnLevelAction += changedPlayer;
-        
+        LevelManager.OnRespaw += respawPlayer;
+
+    }
+
+    private void respawPlayer(Global.typeOfPlayer type) {
+        hearths = ScoreController.instance.getCurrentHealthFromPlayer(type);
+        currentHealth = ScoreController.instance.getHearthsFromPlayer(type);
+
+        setQuantidadeCoracao(hearths);
+
+        updateHealthShow();
     }
 
     private void changedPlayer(IPlayerAction action,Global.typeOfPlayer type) {

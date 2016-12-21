@@ -45,7 +45,6 @@ public class ScoreController : MonoBehaviour {
             if(collectiable.canRespaw)
                 collectiable.ResetObject();
         }
-
     }
 
     void MakeInstance() {
