@@ -11,6 +11,7 @@ public class InteractiveItensController : MonoBehaviour {
 
     public static event ItemActiveByPlayer OnItemActivedByPlayer;
 
+    public bool allPlayersCanCatch;
     public bool isItemActive;
     public bool CanBeDesactived;
 
@@ -29,10 +30,21 @@ public class InteractiveItensController : MonoBehaviour {
 
     }
 
+    private bool checkWhoCanIterateWithItem(Global.typeOfPlayer player) {
+        if (allPlayersCanCatch) {
+            return true;
+        } else {
+            return typeOfPlayerCanActived.Equals(player);
+        }
+    }
+
     void OnTriggerEnter2D(Collider2D other) {
         bool actionActive = true;
         if (OnItemActivedByPlayer != null) {
-            if (!Global.getTypeOfPlayerByTag(other.tag).Equals(Global.typeOfPlayer.Player_None)) {
+            Global.typeOfPlayer player = Global.getTypeOfPlayerByTag(other.tag);
+            if (!Global.typeOfPlayer.Player_None.Equals(player)
+                    && checkWhoCanIterateWithItem(player)) {
+
                 if (CanBeDesactived) {
                     isItemActive = !isItemActive;
                 } else {

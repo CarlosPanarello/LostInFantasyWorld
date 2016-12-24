@@ -57,7 +57,9 @@ public class HurtPlayer : MonoBehaviour {
                 return true;
             case Global.typeOfCanHurt.Lava:
                 return !player.canWalkInLava;
-            case Global.typeOfCanHurt.Spikes:
+            case Global.typeOfCanHurt.Static_Danger:
+                return true;
+            case Global.typeOfCanHurt.Moving_Danger:
                 return true;
             case Global.typeOfCanHurt.Water:
                 return !player.canSwim;

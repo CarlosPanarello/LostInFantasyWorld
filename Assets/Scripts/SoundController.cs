@@ -51,8 +51,10 @@ public class SoundController : MonoBehaviour {
     void Start () {
     }
 
-    private void soundItemCatch(int valueOfItem, Global.typeOfPlayer player, Global.typeOfItem item) {
-        switch (item) {
+    private void soundItemCatch(int valueOfItem,
+        Global.typeOfPlayer player,
+        CollectiablesController item) {
+        switch (item.typeOfItem) {
             case Global.typeOfItem.Gem_Blue:
             case Global.typeOfItem.Gem_Green:
             case Global.typeOfItem.Gem_Red:

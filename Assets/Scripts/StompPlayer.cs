@@ -24,6 +24,5 @@ public class StompPlayer : MonoBehaviour {
             Instantiate(explodirInimigo, other.transform.position, other.transform.rotation);
             playerRigidBody.velocity = new Vector3(playerRigidBody.velocity.x, bouceForce, 0f);
         }
-
     }
 }

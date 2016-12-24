@@ -25,8 +25,6 @@ public class PlayerControl : MonoBehaviour {
 
     public GameObject stompBox;
 
-    public LevelManager level;
-
     public AudioSource ferirSom;
     public AudioSource jumpSound;
 
@@ -51,6 +49,7 @@ public class PlayerControl : MonoBehaviour {
     public Sprite spriteBotonCenter;
     public Vector3 respawnPosition;
 
+
     void Awake() {
         //Atribuindo uma função qdo o jogador for ferido
         HurtPlayer.OnHurtPlayer += machucarJogador;
@@ -69,8 +68,8 @@ public class PlayerControl : MonoBehaviour {
     private void actionController(IPlayerAction action) {
         if (isAtivo) {
             if (knockbackCounter <= 0) {
-                isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, level.whatIsGround);
-                isLavaGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, level.whatIsLava);
+                isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, LevelManager.instance.whatIsGround);
+                isLavaGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, LevelManager.instance.whatIsLava);
 
                 if (isLavaGrounded) {
                     if (canWalkInLava) {
@@ -97,7 +96,7 @@ public class PlayerControl : MonoBehaviour {
         meuRigibody = GetComponent<Rigidbody2D>();
         meuAnim = GetComponent<Animator>();
         respawnPosition = transform.position;
-        level = FindObjectOfType<LevelManager>();
+        
         executandoDano = false;
         renascendo = false;
         jogadorParado = true;
@@ -124,9 +123,9 @@ public class PlayerControl : MonoBehaviour {
     // Update is called once per frame
     void Update() {
 
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, level.whatIsGround);
-        isSwinning = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, level.whatIsWater);
-        isLavaGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, level.whatIsLava);
+        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, LevelManager.instance.whatIsGround);
+        isSwinning = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, LevelManager.instance.whatIsWater);
+        isLavaGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, LevelManager.instance.whatIsLava);
 
         if (isSwinning) {
             if (canSwim) {
@@ -138,7 +137,7 @@ public class PlayerControl : MonoBehaviour {
             meuRigibody.gravityScale = 2.5f;
         }
 
-        isLavaGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, level.whatIsLava);
+        isLavaGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, LevelManager.instance.whatIsLava);
         if (isLavaGrounded) {
             if (canWalkInLava) {
                 isGrounded = true;
@@ -207,12 +206,46 @@ public class PlayerControl : MonoBehaviour {
         congelarJogador();
     }
 
+    public void Respawn() {
+        //TIpo Thread
+        StartCoroutine("RespawnCoRoutine");
+    }
+
+    public IEnumerator RespawnCoRoutine() {
+
+        gameObject.SetActive(false);
+
+        // Não funciona o objeto ja esta foi criado.
+        //explosao.GetComponent<ParticleSystem>().startColor = jogador_ativo.obterCorParaExplosaoMorte();
+
+        Instantiate(LevelManager.instance.explosao, transform.position, transform.rotation);
+
+        yield return new WaitForSeconds(LevelManager.instance.tempoEsperaRespawn);
+
+        //jogadorRespaw.Respawing(vidaMaxima);
+
+        gameObject.SetActive(true);
+
+        renascendo = false;
+
+        //UpdateCoracao ();
+
+        // Resetando as moedas e iniciando objetos;
+        /*
+        foreach (ResetOnRespawn objeto in objetosParaResetar) {
+            objeto.gameObject.SetActive(true);
+            objeto.ResetObject();
+        }
+        */
+
+    }
+
     void OnTriggerEnter2D(Collider2D outro) {
         if (isAtivo) {
             if (outro.tag == "KillPlane") {
                 //gameObject.SetActive (false);
                 //transform.position = respawnPosition;
-                level.Respawn(this);
+                Respawn();
             }
         }
     }

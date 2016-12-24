@@ -50,47 +50,69 @@ public class InputController : MonoBehaviour {
     }
 
     public void toRight() {
-        OnPlayerAction(new MoverParaDireita());
+        if (OnPlayerAction != null) {
+            OnPlayerAction(new MoverParaDireita());
+        }
     }
 
     public void toLeft() {
-        OnPlayerAction(new MoverParaEsquerda());
+        if (OnPlayerAction != null) {
+            OnPlayerAction(new MoverParaEsquerda());
+        }
     }
 
     public void toIdle() {
-        OnPlayerAction(new ActionIdle());
+        if (OnPlayerAction != null) {
+            OnPlayerAction(new ActionIdle());
+        }
     }
 
     public void jump() {
-        OnPlayerAction(new ActionJump());
+        if (OnPlayerAction != null) {
+            OnPlayerAction(new ActionJump());
+        }
     }
 
     public void especial() {
-        OnPlayerAction(new ActionEspecial());
-        OnPlayerAction(new ActionSwim());
+        if (OnPlayerAction != null) {
+            OnPlayerAction(new ActionEspecial());
+            OnPlayerAction(new ActionSwim());
+        }
     }
 
     public void changePlayer() {
-        OnPlayerAction(new ActionChangePlayer());
+        if (OnPlayerAction != null) {
+            OnPlayerAction(new ActionChangePlayer());
+        }
     }
 
     public void pause() {
-        OnGameAction(new PauseGame());
+        if (OnGameAction != null) {
+            OnGameAction(new PauseGame());
+        }
     }
 
     public void resume() {
-        OnGameAction(new ResumeGame());
+        if (OnGameAction != null) {
+            OnGameAction(new ResumeGame());
+        }
     }
 
     public void start() {
-        OnGameAction(new StartGame());
+        if (OnGameAction != null) {
+            OnGameAction(new StartGame());
+        }
     }
 
     public void quit() {
-        OnGameAction(new QuitGame());
+        if (OnGameAction != null) {
+            OnGameAction(new QuitGame());
+        }
     }
 
     public void config() {
-        OnGameAction(new ConfigGame());
+        if (OnGameAction != null) {
+            OnGameAction(new ConfigGame());
+        }
     }
 }

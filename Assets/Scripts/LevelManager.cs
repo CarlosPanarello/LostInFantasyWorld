@@ -45,11 +45,13 @@ public class LevelManager : MonoBehaviour {
     }
 
     private void playerDies(Global.typeOfPlayer player) {
-        foreach (PlayerControl scriptPlayer in listOfPlayers) {
-            if (scriptPlayer.tipo.Equals(player)) {
+        if (OnRespaw != null) { 
+            foreach (PlayerControl scriptPlayer in listOfPlayers) {
+                if (scriptPlayer.tipo.Equals(player)) {
 
-                if (canRespaw) {
-                    OnRespaw( player);
+                    if (canRespaw) {
+                        OnRespaw(player);
+                    }
                 }
             }
         }
@@ -143,39 +145,7 @@ public class LevelManager : MonoBehaviour {
         */
 	}
 
-	public void Respawn(PlayerControl jogadorRespaw){
-		//TIpo Thread
-		StartCoroutine ("RespawnCoRoutine", jogadorRespaw);
-	}
 
-	public IEnumerator RespawnCoRoutine(PlayerControl jogadorRespaw) {
-
-        jogadorRespaw.gameObject.SetActive (false);
-
-        // Não funciona o objeto ja esta foi criado.
-        //explosao.GetComponent<ParticleSystem>().startColor = jogador_ativo.obterCorParaExplosaoMorte();
-
-        Instantiate (explosao, jogadorRespaw.transform.position, jogadorRespaw.transform.rotation);
-        
-        yield return new WaitForSeconds (tempoEsperaRespawn);
-
-        //jogadorRespaw.Respawing(vidaMaxima);
-
-        jogadorRespaw.gameObject.SetActive (true);
-
-        jogadorRespaw.renascendo = false;
-
-        //UpdateCoracao ();
-
-        // Resetando as moedas e iniciando objetos;
-        /*
-        foreach (ResetOnRespawn objeto in objetosParaResetar) {
-            objeto.gameObject.SetActive(true);
-            objeto.ResetObject();
-        }
-        */
-
-	}
 
     public Vector3 posicaoJogadorAtivo() {
         return playerActive.transform.position;

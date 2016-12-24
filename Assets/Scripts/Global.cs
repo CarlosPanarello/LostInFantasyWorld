@@ -37,7 +37,8 @@ public class Global {
     public enum typeOfCanHurt {
         None,
         Enemy,
-        Spikes,
+        Static_Danger,
+        Moving_Danger,
         Lava,
         Water
     }
@@ -61,8 +62,8 @@ public class Global {
     public enum typeOfMovementEnemy {
         Perseguir,
         Patrulha,
-        IrDireita,
-        IrEsquerda
+        Ir_Direita,
+        Ir_Esquerda
     };
 
     public static typeOfPlayer getTypeOfPlayerByTag(string valor) {

@@ -102,10 +102,10 @@ public class SpiderControl : MonoBehaviour {
     // Update is called once per frame
     void Update() {
         switch (tipoMovimento) {
-            case Global.typeOfMovementEnemy.IrDireita:
+            case Global.typeOfMovementEnemy.Ir_Direita:
                 movimentarParaDireita();
                 break;
-            case Global.typeOfMovementEnemy.IrEsquerda:
+            case Global.typeOfMovementEnemy.Ir_Esquerda:
                 movimentarParaEsquerda();
                 break;
             case Global.typeOfMovementEnemy.Perseguir:

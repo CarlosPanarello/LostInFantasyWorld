@@ -10,25 +10,35 @@ public class CollectiablesController : MonoBehaviour {
     public static event ItemCollect OnItemCollect;
 
     public Global.typeOfItem typeOfItem;
-
+    public Global.typeOfPlayer typeOfPlayerThatCanCatchItem;
+    
     public int valueOfItem;
 
+    public bool allPlayersCanCatch;
     public bool canRespaw;
-
+    
     private Vector3 startPosition;
     private Quaternion startRotation;
     private Vector3 startLocalScale;
     private Rigidbody2D body;
-    private Global.typeOfPlayer typeOfPlayerThatCatchItem;
+    
 
     void Awake() {
         //TODO colocar um alerta para qdo for respaw
         LevelManager.OnRespaw += respawCollectibles;
     }
 
+    private bool checkWhoCanCatchItem(Global.typeOfPlayer player) {
+        if (allPlayersCanCatch) {
+            return true;
+        } else {
+            return typeOfPlayerThatCanCatchItem.Equals(player);
+        }
+    }
+
     private void respawCollectibles( Global.typeOfPlayer player) {
         if (!this.gameObject.activeSelf && canRespaw 
-            && typeOfPlayerThatCatchItem.Equals(player) ) {
+            && typeOfPlayerThatCanCatchItem.Equals(player) ) {
             this.gameObject.SetActive(true);
             this.ResetObject();
         }
@@ -65,20 +75,15 @@ public class CollectiablesController : MonoBehaviour {
         if (OnItemCollect != null) {
             Global.typeOfPlayer player = Global.getTypeOfPlayerByTag(other.tag);
             //Qualquer tag nao encontrada sera definida como Player_None
-            //Assim qualquer outro tipo de jogador ira sofre dano
-            switch (Global.getTypeOfPlayerByTag(other.tag)) {
-                case Global.typeOfPlayer.Player_None:
-                    break;
-                default:
-                    typeOfPlayerThatCatchItem = player;
-                    if (OnItemCollect != null) { 
-                        OnItemCollect(valueOfItem, player, this);
-                    }
+            //Tem q ser um Player e tem que estar apto a pegar o item
+            if (!Global.typeOfPlayer.Player_None.Equals(player) 
+                    && checkWhoCanCatchItem(player)) {
 
-                    //TODO verificar se como fica o delagate das classes pressas a ele
-                    //Destroy (gameObject);
-                    gameObject.SetActive(false);
-                    break;
+                typeOfPlayerThatCanCatchItem = player;
+                OnItemCollect(valueOfItem, player, this);
+                //TODO verificar se como fica o delagate das classes pressas a ele
+                //Destroy (gameObject);
+                gameObject.SetActive(false);
             }
         }
     }
