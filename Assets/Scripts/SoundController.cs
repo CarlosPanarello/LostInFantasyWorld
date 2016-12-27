@@ -44,11 +44,36 @@ public class SoundController : MonoBehaviour {
     }
 
     private void actionController(IPlayerAction action) {
-        action.playSound(playerJumpBege);
+		if (action.GetType () == typeof(ActionJump)) {
+			PlayerControl player = LevelManager.instance.getActivePlayer ();
+
+			switch (player.tipo) {
+			case Global.typeOfPlayer.Player_Bege:
+				action.playSound (playerJumpBege,player.isGrounded);
+				break;
+			case Global.typeOfPlayer.Player_Blue:
+				action.playSound (playerJumpBlue,player.isGrounded);
+				break;
+			case Global.typeOfPlayer.Player_Green:
+				action.playSound (playerJumpGreen,player.isGrounded);
+				break;
+			case Global.typeOfPlayer.Player_Pink:
+				action.playSound (playerJumpPink,player.isGrounded);
+				break;
+			case Global.typeOfPlayer.Player_Yellow:
+				action.playSound (playerJumpYellow,player.isGrounded);
+				break;
+			default:
+				break;
+			}
+		}
     }
 
     // Use this for initialization
     void Start () {
+		musicLevel.loop = true;
+		//musicLevel.Play();
+
     }
 
     private void soundItemCatch(int valueOfItem,

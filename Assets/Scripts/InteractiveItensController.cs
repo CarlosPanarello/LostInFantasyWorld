@@ -18,16 +18,15 @@ public class InteractiveItensController : MonoBehaviour {
     public Global.typeOfPlayer typeOfPlayerCanActived;
     public Global.InteractiveItem typeOfInteractiveItem;
 
-    private Animator animation;
+    private Animator animacao;
     // Use this for initialization
     void Start() {
-        animation = GetComponent<Animator>();
-        animation.SetBool("ativo", isItemActive);
+		animacao = GetComponent<Animator>();
     }
 
     // Update is called once per frame
     void Update() {
-
+		animacao.SetBool("ativo", isItemActive);
     }
 
     private bool checkWhoCanIterateWithItem(Global.typeOfPlayer player) {
@@ -39,7 +38,6 @@ public class InteractiveItensController : MonoBehaviour {
     }
 
     void OnTriggerEnter2D(Collider2D other) {
-        bool actionActive = true;
         if (OnItemActivedByPlayer != null) {
             Global.typeOfPlayer player = Global.getTypeOfPlayerByTag(other.tag);
             if (!Global.typeOfPlayer.Player_None.Equals(player)
@@ -47,12 +45,17 @@ public class InteractiveItensController : MonoBehaviour {
 
                 if (CanBeDesactived) {
                     isItemActive = !isItemActive;
+					animacao.SetBool ("ativo", isItemActive);
+					//Trocar esses dois Enum por um bool
+					OnItemActivedByPlayer (isItemActive, Global.getTypeOfPlayerByTag (other.tag), typeOfPlayerCanActived, typeOfInteractiveItem, transform.position);
                 } else {
-                    isItemActive = actionActive;
+					if (isItemActive == false) {
+						isItemActive = true;
+						animacao.SetBool ("ativo", true);
+						//Trocar esses dois Enum por um bool
+						OnItemActivedByPlayer (true, Global.getTypeOfPlayerByTag (other.tag), typeOfPlayerCanActived, typeOfInteractiveItem, transform.position);
+					}
                 }
-                animation.SetBool("ativo", isItemActive);
-                //Trocar esses dois Enum por um bool
-                OnItemActivedByPlayer(isItemActive, Global.getTypeOfPlayerByTag(other.tag), typeOfPlayerCanActived, typeOfInteractiveItem,transform.position);
             }
         }
     }

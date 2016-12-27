@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using System;
 
 public class LevelManager : MonoBehaviour {
 
@@ -23,9 +24,8 @@ public class LevelManager : MonoBehaviour {
 
     //Novos Metodos
     public bool canRespaw;
-    private List<PlayerControl> listOfPlayers;
-    private PlayerControl playerActive;
-
+    public List<PlayerControl> listOfPlayers;
+    
     public delegate void LevelActions(IPlayerAction action,Global.typeOfPlayer tipoPlayer);
     public static event LevelActions OnLevelAction;
 
@@ -80,6 +80,7 @@ public class LevelManager : MonoBehaviour {
 
     private void inicializarListaJogaresPossiveis() {
         listOfPlayers = new List<PlayerControl>(5);
+		PlayerControl playerActive = getActivePlayer ();
 
         if(jogador_Green != null) {
             if (playerActive == null) {
@@ -131,6 +132,7 @@ public class LevelManager : MonoBehaviour {
 
             listOfPlayers.Add(jogador_Yellow);
         }
+
     }
 	
 	// Update is called once per frame
@@ -143,11 +145,26 @@ public class LevelManager : MonoBehaviour {
             }
         }
         */
+
 	}
 
 
 
     public Vector3 posicaoJogadorAtivo() {
-        return playerActive.transform.position;
+		return getActivePlayer().transform.position;
     }
+
+	public Global.typeOfPlayer getTypeActivePlayer(){
+		return getActivePlayer().tipo;
+	}
+
+	public PlayerControl getActivePlayer(){
+		foreach (PlayerControl player in listOfPlayers) {
+			if (player.isAtivo) {
+				return player;
+			}
+		}
+
+		return null;
+	}
 }

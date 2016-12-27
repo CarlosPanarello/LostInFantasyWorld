@@ -27,37 +27,38 @@ public class CameraController : MonoBehaviour {
         targetPosition = Vector3.zero;
     }
 	// Pega a posicao do objeto e adiciona um valor a esquerda ou direita
-	private Vector3 pegarPosicao(GameObject objeto){
+	private Vector3 pegarPosicao(Transform transf){
 		Vector3 posicao;
-		posicao = new Vector3 (objeto.transform.position.x, objeto.transform.position.y, transform.position.z);
+		posicao = new Vector3 (transf.position.x, transf.position.y, transform.position.z);
 
-		if (objeto.transform.localScale.x > 0f) {
-			posicao = new Vector3 (posicao.x + followAhead, posicao.y, posicao.z);
+		if (transf.localScale.x > 0f) {
+			posicao = new Vector3 (posicao.x + followAhead, posicao.y, transform.position.z);
 		} else {
-			posicao = new Vector3 (posicao.x - followAhead, posicao.y, posicao.z);
+			posicao = new Vector3 (posicao.x - followAhead, posicao.y, transform.position.z);
 		}
 		return posicao;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-        posicionarCameraAlvo(transform.position);
+        //posicionarCameraAlvo(transform.position);
     }
 
-	public void posicionarCameraAlvo(GameObject alvo){
-        posicionarCameraAlvo(pegarPosicao(alvo));
+	public void posicionarCameraAlvo(Transform transf){
+		posicionarCameraAlvo(pegarPosicao(transf));
 	}
 
-    public void posicionarCameraAlvo(Vector3 position) {
+    private void posicionarCameraAlvo(Vector3 position) {
+		//TODO colocar a mesma logica do metodo com o gameobject
         targetPosition = position;
         transform.position = Vector3.Lerp(transform.position, targetPosition, velocidadeCamera * Time.fixedDeltaTime);
     }
 
-    public void posicionarCameraComOutroPlayer(GameObject alvo) {
-        posicionarCameraComOutroPlayer(pegarPosicao(alvo));
+	public void posicionarCameraComOutroPlayer(Transform transf) {
+		posicionarCameraComOutroPlayer(pegarPosicao(transf));
     }
 
-    public void posicionarCameraComOutroPlayer(Vector3 position) {
+    private void posicionarCameraComOutroPlayer(Vector3 position) {
         targetPosition = position;
         transform.position = Vector3.Lerp(transform.position, position, velCameraMudJogador * Time.fixedDeltaTime);
     }

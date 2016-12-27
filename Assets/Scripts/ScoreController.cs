@@ -10,10 +10,10 @@ public class ScoreController : MonoBehaviour {
 
     public static ScoreController instance;
 
-    private Dictionary<Global.typeOfPlayer, int> maxHealth ;
+	private Dictionary<Global.typeOfItem, bool> itens;
+	private Dictionary<Global.typeOfPlayer, int> maxHealth ;
     private Dictionary<Global.typeOfPlayer, int> currentHealth ;
-
-    private Dictionary<Global.typeOfPlayer, int> currentCoinsByPlayer;
+	private Dictionary<Global.typeOfPlayer, int> currentCoinsByPlayer;
 
     private int initialCoins;
     private int totalCurrentCoins;
@@ -22,8 +22,6 @@ public class ScoreController : MonoBehaviour {
     public int maxHealthOfBlue;
     public int maxHealthOfPink;
     public int maxHealthOfYellow;
-
-    private Dictionary<Global.typeOfItem, bool> itens;
 
     private List<CollectiablesController> listItensCatch;
 
@@ -37,7 +35,8 @@ public class ScoreController : MonoBehaviour {
     }
 
     private void respawPlayer(Global.typeOfPlayer player) {
-        initializeHealth();
+		//TODO arrumar isso aqui, nao pode ter inicializacao de tudo qdo der respaw
+        //initializeHealthCoins();
         totalCurrentCoins -= currentCoinsByPlayer[player];
         currentCoinsByPlayer[player] = 0;
 
@@ -51,28 +50,26 @@ public class ScoreController : MonoBehaviour {
         if (instance == null) {
             instance = this;
         }
-        listItensCatch = new List<CollectiablesController>();
-
+		initializeLists();
     }
 
     // Use this for initialization
     void Start() {
-        maxHealth = new Dictionary<Global.typeOfPlayer, int>();
-        currentHealth = new Dictionary<Global.typeOfPlayer, int>();
-        itens = new Dictionary<Global.typeOfItem, bool>();
-
-        initializeHealth();
-
-        foreach (Global.typeOfItem item in Enum.GetValues(typeof(Global.typeOfItem))) {
-            if (!Global.typeOfItem.Item_None.Equals(item)) {
-                itens.Add(item, false);
-            }
-        }
     }
 
-    private void initializeHealth() {
+    private void initializeLists() {
+		maxHealth = new Dictionary<Global.typeOfPlayer, int>();
+		currentHealth = new Dictionary<Global.typeOfPlayer, int>();
+		itens = new Dictionary<Global.typeOfItem, bool>();
+		currentCoinsByPlayer = new Dictionary<Global.typeOfPlayer, int>();
+		listItensCatch = new List<CollectiablesController>();
 
         foreach (Global.typeOfPlayer player in Enum.GetValues(typeof(Global.typeOfPlayer))) {
+
+			if(!Global.typeOfPlayer.Player_None.Equals(player)){
+				currentCoinsByPlayer.Add(player,0);
+			}
+
             switch (player) {
                 case Global.typeOfPlayer.Player_Bege:
                     maxHealth.Add(player, maxHealthOfBege);
@@ -98,6 +95,12 @@ public class ScoreController : MonoBehaviour {
                     break;
             }
         }
+
+		foreach (Global.typeOfItem item in Enum.GetValues(typeof(Global.typeOfItem))) {
+			if (!Global.typeOfItem.Item_None.Equals(item)) {
+				itens.Add(item, false);
+			}
+		}
     }
 
     private void upadateItemCatch(int valueOfItem,

@@ -33,16 +33,16 @@ public class InputController : MonoBehaviour {
                 toLeft();
             } else {
                 toIdle();
-
-        }
+			}
         //Pulo
         if (Input.GetButtonDown("Jump")) {
             jump();
         }
-
+		/*
         if (Input.GetButton("Pause")) {
             pause();
         }
+        */
     }
 
     public void OnRealeaseRightOrLeftButton() {

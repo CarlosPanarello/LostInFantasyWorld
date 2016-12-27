@@ -19,6 +19,7 @@ public class BalancarObjetos : MonoBehaviour {
         grauDireita = valor;
         grauEsquerda = 360 - valor;
         direta = true;
+		//TODO isso aqui ta estranho 
         step = velocidade * Time.deltaTime;
        // transform.rotation = new Quaternion(2)
 

@@ -70,7 +70,7 @@ public class UIControl : MonoBehaviour {
 
     public int quantidadeMoeda;
     public int quantidadeChaves;
-    public int quantidadeGemas;
+    //public int quantidadeGemas;
 
     private List<Image> listaCoracoes;
     private int hearths;
@@ -99,92 +99,74 @@ public class UIControl : MonoBehaviour {
         CollectiablesController.OnItemCollect += catchItem;
         LevelManager.OnLevelAction += changedPlayer;
         LevelManager.OnRespaw += respawPlayer;
-
     }
 
     private void respawPlayer(Global.typeOfPlayer type) {
         hearths = ScoreController.instance.getCurrentHealthFromPlayer(type);
         currentHealth = ScoreController.instance.getHearthsFromPlayer(type);
-
         setQuantidadeCoracao(hearths);
-
         updateHealthShow();
     }
 
+
+
     private void changedPlayer(IPlayerAction action,Global.typeOfPlayer type) {
-        action.changedPlayer(botaoMudarJogador,playerAtivo);
-        hearths = ScoreController.instance.getCurrentHealthFromPlayer(type);
-        currentHealth = ScoreController.instance.getHearthsFromPlayer(type);
+
+		setPlayerIcons(botaoMudarJogador,playerAtivo);
+
+		hearths = ScoreController.instance.getHearthsFromPlayer(type);
+		currentHealth = ScoreController.instance.getCurrentHealthFromPlayer(type);
+		setQuantidadeCoracao(hearths);
         updateHealthShow();
     }
 
     void MakeInstance() {
         if(instance == null) {
-            inicializarItens();
             instance = this;
         }
     }
 
-    //##########################################################################################################
+	private void setPlayerIcons(Button buttonNextPlayer, Image imageCurrentPlayer){
+		List<PlayerControl> listOfPlayersInternal = LevelManager.instance.listOfPlayers;
+		int indiceJogadorAtivo = 0;
+		foreach (PlayerControl jogador in listOfPlayersInternal) {
+			if (jogador.isAtivo) {
+				imageCurrentPlayer.sprite = jogador.spriteBotonFull;
+				break;
+			}
+			indiceJogadorAtivo++;
+		}
 
-    public void setQuantidadeInicialMoedas(int qtdMoedas) {
+		if (indiceJogadorAtivo >= listOfPlayersInternal.Count - 1) {
+			indiceJogadorAtivo = 0;
+		} else {
+			indiceJogadorAtivo++;
+		}
+
+		buttonNextPlayer.image.sprite = listOfPlayersInternal[indiceJogadorAtivo].spriteBotonCenter;
+	}
+
+    private void setQuantidadeInicialMoedas(int qtdMoedas) {
         currentCoin = qtdMoedas;
         updateCurrentCoins();
     }
 
-    public void setQuantidadeCoracao(int fullHearts) {
+    private void setQuantidadeCoracao(int fullHearts) {
         hearths = fullHearts;
         //cada coração possui 2 divisoes
         currentHealth = fullHearts * 2;
-        for (int cont = 1; cont <= fullHearts; cont++) {
-            switch (cont) {
-                case 1:
-                    coracao_01.gameObject.SetActive(true);
-                    listaCoracoes.Add(coracao_01);
-                    break;
-                case 2:
-                    coracao_02.gameObject.SetActive(true);
-                    listaCoracoes.Add(coracao_02);
-                    break;
-                case 3:
-                    coracao_03.gameObject.SetActive(true);
-                    listaCoracoes.Add(coracao_03);
-                    break;
-                case 4:
-                    coracao_04.gameObject.SetActive(true);
-                    listaCoracoes.Add(coracao_04);
-                    break;
-                case 5:
-                    coracao_05.gameObject.SetActive(true);
-                    listaCoracoes.Add(coracao_05);
-                    break;
-                case 6:
-                    coracao_06.gameObject.SetActive(true);
-                    listaCoracoes.Add(coracao_06);
-                    break;
-                case 7:
-                    coracao_07.gameObject.SetActive(true);
-                    listaCoracoes.Add(coracao_07);
-                    break;
-                case 8:
-                    coracao_08.gameObject.SetActive(true);
-                    listaCoracoes.Add(coracao_08);
-                    break;
-                case 9:
-                    coracao_09.gameObject.SetActive(true);
-                    listaCoracoes.Add(coracao_09);
-                    break;
-                case 10:
-                    coracao_10.gameObject.SetActive(true);
-                    listaCoracoes.Add(coracao_10);
-                    break;
-                default:
-                    break;
-            }
+		bool isCoracaoAtivo = true;
+
+		for (int cont = 1; cont <= 10; cont++) {
+			if (cont > fullHearts) {
+				isCoracaoAtivo = false;
+			}
+			listaCoracoes [cont-1].gameObject.SetActive (isCoracaoAtivo);
         }
+		updateHealthShow();
     }
 
-    public void setQuantidadeChaves(int qtd) {
+    private void setQuantidadeChaves(int qtd) {
         switch (qtd) {
             case 0:
                 chave_azul.gameObject.SetActive(false);
@@ -193,24 +175,34 @@ public class UIControl : MonoBehaviour {
                 chave_amarelo.gameObject.SetActive(false);
                 break;
             case 1:
+				chave_azul.gameObject.SetActive(true);
                 chave_azul.sprite = s_key_azul_disable;
                 chave_verde.gameObject.SetActive(false);
                 chave_vermelho.gameObject.SetActive(false);
                 chave_amarelo.gameObject.SetActive(false);
                 break;
             case 2:
+				chave_azul.gameObject.SetActive(true);
+				chave_verde.gameObject.SetActive(true);
                 chave_azul.sprite = s_key_azul_disable;
                 chave_verde.sprite = s_key_verde_disable;
                 chave_vermelho.gameObject.SetActive(false);
                 chave_amarelo.gameObject.SetActive(false);
                 break;
             case 3:
+				chave_azul.gameObject.SetActive(true);
+				chave_verde.gameObject.SetActive(true);
+				chave_vermelho.gameObject.SetActive(true);
                 chave_azul.sprite = s_key_azul_disable;
                 chave_verde.sprite = s_key_verde_disable;
                 chave_vermelho.sprite = s_key_vermelho_disable;
                 chave_amarelo.gameObject.SetActive(false);
                 break;
             default:
+				chave_azul.gameObject.SetActive(true);
+				chave_verde.gameObject.SetActive(true);
+				chave_vermelho.gameObject.SetActive(true);
+				chave_amarelo.gameObject.SetActive(true);
                 chave_azul.sprite = s_key_azul_disable;
                 chave_verde.sprite = s_key_verde_disable;
                 chave_vermelho.sprite = s_key_vermelho_disable;
@@ -218,6 +210,7 @@ public class UIControl : MonoBehaviour {
                 return;
         }
     }
+
 
     public void ativarBotoesControleGame(bool ativar) {
         conjuntoBotaoGame.SetActive(ativar);
@@ -228,7 +221,9 @@ public class UIControl : MonoBehaviour {
     }
 
     void Start() {
-
+		inicializarItens();
+		carregarValoresInicias (LevelManager.instance.getTypeActivePlayer ());
+		setPlayerIcons (botaoMudarJogador,playerAtivo);
     }
 
     //Metodos Privados
@@ -240,15 +235,15 @@ public class UIControl : MonoBehaviour {
                 break;
             case Global.typeOfItem.Gem_Green:
                 gema_verde.gameObject.SetActive(true);
-                gema_verde.sprite = s_gema_azul;
+                gema_verde.sprite = s_gema_verde;
                 break;
             case Global.typeOfItem.Gem_Red:
                 gema_vermelho.gameObject.SetActive(true);
-                gema_vermelho.sprite = s_gema_azul;
+                gema_vermelho.sprite = s_gema_laranja;
                 break;
             case Global.typeOfItem.Gem_Yellow:
                 gema_amarelo.gameObject.SetActive(true);
-                gema_amarelo.sprite = s_gema_azul;
+                gema_amarelo.sprite = s_gema_amarela;
                 break;
             case Global.typeOfItem.Key_Blue:
                 chave_azul.sprite = s_key_azul_enable;
@@ -293,21 +288,40 @@ public class UIControl : MonoBehaviour {
         gema_vermelho.gameObject.SetActive(false);
         gema_amarelo.gameObject.SetActive(false);
 
-        coracao_01.gameObject.SetActive(false);
-        coracao_02.gameObject.SetActive(false);
-        coracao_03.gameObject.SetActive(false);
-        coracao_04.gameObject.SetActive(false);
-        coracao_05.gameObject.SetActive(false);
-        coracao_06.gameObject.SetActive(false);
-        coracao_07.gameObject.SetActive(false);
-        coracao_08.gameObject.SetActive(false);
-        coracao_09.gameObject.SetActive(false);
-        coracao_10.gameObject.SetActive(false);
+		chave_azul.gameObject.SetActive (false);
+		chave_verde.gameObject.SetActive (false);
+		chave_vermelho.gameObject.SetActive (false);
+		chave_amarelo.gameObject.SetActive (false);
+
+		listaCoracoes.Add (coracao_01);
+		listaCoracoes.Add (coracao_02);
+		listaCoracoes.Add (coracao_03);
+		listaCoracoes.Add (coracao_04);
+		listaCoracoes.Add (coracao_05);
+		listaCoracoes.Add (coracao_06);
+		listaCoracoes.Add (coracao_07);
+		listaCoracoes.Add (coracao_08);
+		listaCoracoes.Add (coracao_09);
+		listaCoracoes.Add (coracao_10);
+
+		foreach (Image i in listaCoracoes) {
+			i.gameObject.SetActive (false);
+		}
     }
+
+	public void carregarValoresInicias(Global.typeOfPlayer tipo){
+		setQuantidadeChaves (quantidadeChaves);
+
+		setQuantidadeInicialMoedas (quantidadeMoeda);
+
+		if (!Global.typeOfPlayer.Player_None.Equals (tipo)) {
+			setQuantidadeCoracao (ScoreController.instance.getHearthsFromPlayer(tipo));
+		}
+	}
 	
 	// Update is called once per frame
 	void Update () {
-
+		//Global.typeOfPlayer tipo = LevelManager.instance.getTypeActivePlayer();
     }
 
     private void updateHearthDamage(int dano, Global.typeOfPlayer type) {

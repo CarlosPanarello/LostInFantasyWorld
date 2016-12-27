@@ -25,16 +25,13 @@ public class PlayerControl : MonoBehaviour {
 
     public GameObject stompBox;
 
-    public AudioSource ferirSom;
-    public AudioSource jumpSound;
-
     public bool renascendo;
 
     private bool actionSwin = false;
     private Animator meuAnim;
     private Rigidbody2D meuRigibody;
     public bool executandoDano;
-    private bool jogadorParado;
+    private bool jogadorParando;
     
     public float knockbackForce;
     public float knockbackLength;
@@ -48,7 +45,6 @@ public class PlayerControl : MonoBehaviour {
     public Sprite spriteBotonFull;
     public Sprite spriteBotonCenter;
     public Vector3 respawnPosition;
-
 
     void Awake() {
         //Atribuindo uma função qdo o jogador for ferido
@@ -79,19 +75,25 @@ public class PlayerControl : MonoBehaviour {
                     }
                 }
 
-                action.playerAction(meuRigibody, transform, moveSpeed, true, isGrounded);
+				if (action.GetType () == typeof(ActionSwim)) {
+					action.playerAction (meuRigibody, transform, swimSpeed, true, isSwinning);										
+				} else {
+					if (action.GetType () == typeof(ActionJump)) {
+						action.playerAction (meuRigibody, transform, jumpSpeed, true, isGrounded);
+					} else {
+						action.playerAction (meuRigibody, transform, moveSpeed, true, isGrounded);
+					}
+				}
+
                 invencivel = false;
             } else {
                 knockbackAction();
             }
-        } else {
-            congelarJogador();
-        }
+        } 
     }
 
     // Use this for initialization
     void Start() {
-        //moveSpeed = 1f;
         isAtivo = false;
         meuRigibody = GetComponent<Rigidbody2D>();
         meuAnim = GetComponent<Animator>();
@@ -99,9 +101,10 @@ public class PlayerControl : MonoBehaviour {
         
         executandoDano = false;
         renascendo = false;
-        jogadorParado = true;
+        jogadorParando = true;
         meuRigibody.isKinematic = true;
         inPlataformaMovel = false;
+
     }
 
     public void machucarJogador(int dano, Global.typeOfPlayer type) {
@@ -122,49 +125,50 @@ public class PlayerControl : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
+		if (isAtivo) {
+			isGrounded = Physics2D.OverlapCircle (groundCheck.position, groundCheckRadius, LevelManager.instance.whatIsGround);
+			isSwinning = Physics2D.OverlapCircle (groundCheck.position, groundCheckRadius, LevelManager.instance.whatIsWater);
+			isLavaGrounded = Physics2D.OverlapCircle (groundCheck.position, groundCheckRadius, LevelManager.instance.whatIsLava);
 
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, LevelManager.instance.whatIsGround);
-        isSwinning = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, LevelManager.instance.whatIsWater);
-        isLavaGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, LevelManager.instance.whatIsLava);
+			if (isSwinning) {
+				if (canSwim) {
+					meuRigibody.gravityScale = 0.25f;
+				} else {
+					//Ferir(1);
+				}
+			} else {
+				meuRigibody.gravityScale = 2.5f;
+			}
 
-        if (isSwinning) {
-            if (canSwim) {
-                meuRigibody.gravityScale = 0.25f;
-            } else {
-                //Ferir(1);
-            }
-        } else {
-            meuRigibody.gravityScale = 2.5f;
-        }
+			isLavaGrounded = Physics2D.OverlapCircle (groundCheck.position, groundCheckRadius, LevelManager.instance.whatIsLava);
+			if (isLavaGrounded) {
+				if (canWalkInLava) {
+					isGrounded = true;
+				} else {
+					//Ferir(1);
+				}
+			}
 
-        isLavaGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, LevelManager.instance.whatIsLava);
-        if (isLavaGrounded) {
-            if (canWalkInLava) {
-                isGrounded = true;
-            } else {
-                //Ferir(1);
-            }
-        }
-
-        if(contadorTempoInvencibilidade <= 0) {
-            invencivel = false;
-        } else {
-            contadorTempoInvencibilidade -= Time.deltaTime;
-        }
+			if (contadorTempoInvencibilidade <= 0) {
+				invencivel = false;
+			} else {
+				contadorTempoInvencibilidade -= Time.deltaTime;
+			}
 
 
-        if (meuRigibody.velocity.y < 0) {
-            stompBox.SetActive(true);
-        } else {
-            if (stompBox != null) {
-                stompBox.SetActive(false);
-            }
-        }
+			if (meuRigibody.velocity.y < 0) {
+				stompBox.SetActive (true);
+			} else {
+				if (stompBox != null) {
+					stompBox.SetActive (false);
+				}
+			}
 
-        meuAnim.SetBool("Hurting", executandoDano);
-        meuAnim.SetFloat("Speed", Mathf.Abs(meuRigibody.velocity.x));
-        meuAnim.SetBool("Grounded", isGrounded);
-        meuAnim.SetBool("Swimming", isSwinning);
+			meuAnim.SetBool ("Hurting", executandoDano);
+			meuAnim.SetFloat ("Speed", Mathf.Abs (meuRigibody.velocity.x));
+			meuAnim.SetBool ("Grounded", isGrounded);
+			meuAnim.SetBool ("Swimming", isSwinning);
+		}
     }
 
     public void startKnockbackAction() {
@@ -183,27 +187,27 @@ public class PlayerControl : MonoBehaviour {
     }
 
     private void congelarJogador() {
-        if ((isSwinning || isGrounded || isLavaGrounded) && !jogadorParado && !inPlataformaMovel) {
-            StartCoroutine("PararJogador");
+        if ((isSwinning || isGrounded || isLavaGrounded) && !jogadorParando && !inPlataformaMovel) {
+			meuRigibody.velocity = Vector3.zero;
+			StartCoroutine("PararJogador");
         }
     }
 
     private IEnumerator PararJogador() {
-        jogadorParado = true;
+		jogadorParando = true;
         yield return new WaitForSeconds(0.05f);
         meuRigibody.isKinematic = true;
     }
 
-
     public void ativarJogador() {
         isAtivo = true;
-        jogadorParado = false;
+        jogadorParando = false;
         meuRigibody.isKinematic = false;
     }
 
     public void desativarJogador() {
         isAtivo = false;
-        congelarJogador();
+		congelarJogador();
     }
 
     public void Respawn() {
@@ -237,8 +241,11 @@ public class PlayerControl : MonoBehaviour {
             objeto.ResetObject();
         }
         */
-
     }
+
+	public bool canSwitchPlayer(){
+		return (isSwinning || isGrounded || isLavaGrounded) && isAtivo;
+	}
 
     void OnTriggerEnter2D(Collider2D outro) {
         if (isAtivo) {
@@ -248,7 +255,17 @@ public class PlayerControl : MonoBehaviour {
                 Respawn();
             }
         }
+
+		if (outro.tag == "Water") {
+			meuRigibody.gravityScale = 0.25f;
+		}
     }
+
+	void OnTriggerExit2D(Collider2D outro){
+		if (outro.tag == "Water") {
+			meuRigibody.gravityScale = 2.5f;
+		}
+	}
 
     void OnCollisionEnter2D(Collision2D outro) {
         if (outro.gameObject.tag == "PlataformaMovel") {
