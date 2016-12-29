@@ -45,6 +45,9 @@ public class PlayerControl : MonoBehaviour {
     public Sprite spriteBotonFull;
     public Sprite spriteBotonCenter;
     public Vector3 respawnPosition;
+	public Vector3 posicaoAnterior;
+
+    private GameObject plataformaMovelObject;
 
     void Awake() {
         //Atribuindo uma função qdo o jogador for ferido
@@ -168,6 +171,10 @@ public class PlayerControl : MonoBehaviour {
 			meuAnim.SetFloat ("Speed", Mathf.Abs (meuRigibody.velocity.x));
 			meuAnim.SetBool ("Grounded", isGrounded);
 			meuAnim.SetBool ("Swimming", isSwinning);
+		} else {
+			if(inPlataformaMovel){
+				movimentar ();
+			}
 		}
     }
 
@@ -187,7 +194,7 @@ public class PlayerControl : MonoBehaviour {
     }
 
     private void congelarJogador() {
-        if ((isSwinning || isGrounded || isLavaGrounded) && !jogadorParando && !inPlataformaMovel) {
+        if ((isSwinning || isGrounded || isLavaGrounded) && !jogadorParando) {
 			meuRigibody.velocity = Vector3.zero;
 			StartCoroutine("PararJogador");
         }
@@ -271,13 +278,35 @@ public class PlayerControl : MonoBehaviour {
         if (outro.gameObject.tag == "PlataformaMovel") {
             transform.parent = outro.transform;
             inPlataformaMovel = true;
+            plataformaMovelObject = outro.gameObject;
         }
     }
 
     void OnCollisionExit2D(Collision2D outro) {
-        if (outro.gameObject.tag == "PlataformaMovel") {
+        if (outro.gameObject.tag == "PlataformaMovel" && isAtivo) {
             transform.parent = null;
             inPlataformaMovel = false;
         }
     }
+
+	private void movimentar() {
+        float posicaoX = transform.position.x;
+        float posicaoPlataformaX = plataformaMovelObject.transform.position.x;
+        float offsetX = Math.Abs(posicaoX) - Math.Abs(posicaoPlataformaX);
+
+        float posicaoY = transform.position.y;
+        float posicaoPlataformaY = plataformaMovelObject.transform.position.y + 0.815f;
+        float offsetY = Math.Abs(posicaoY) - Math.Abs(posicaoPlataformaY);
+
+        if (posicaoX < 0) {
+            offsetX = offsetX * -1f;
+        }
+
+        if (posicaoY < 0) {
+            offsetY = offsetY * -1f;
+        }
+
+        this.transform.position = new Vector3(posicaoPlataformaX + offsetX,
+            posicaoPlataformaY + offsetY, 0f);
+	}
 }

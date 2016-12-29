@@ -11,7 +11,7 @@ public class MoverObjetos : MonoBehaviour {
 
     public float moveSpeed;
 
-	private Vector3 alvoAtual;
+	public Vector3 alvoAtual;
 
 	// Use this for initialization
 	void Start () {
