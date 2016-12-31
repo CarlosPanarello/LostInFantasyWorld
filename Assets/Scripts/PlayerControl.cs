@@ -30,6 +30,7 @@ public class PlayerControl : MonoBehaviour {
     private bool actionSwin = false;
     private Animator meuAnim;
     private Rigidbody2D meuRigibody;
+    private SpriteRenderer[] sprites;
     public bool executandoDano;
     private bool jogadorParando;
     
@@ -37,6 +38,7 @@ public class PlayerControl : MonoBehaviour {
     public float knockbackLength;
     public float knockbackCounter;
 
+    public int contadorInvencibilidade;
     public bool invencivel;
 
     public float tempoInvencibilidade;
@@ -54,6 +56,9 @@ public class PlayerControl : MonoBehaviour {
         HurtPlayer.OnHurtPlayer += machucarJogador;
         InputController.OnPlayerAction += actionController;
         InteractiveItensController.OnItemActivedByPlayer += itemActived;
+        LevelManager.OnKillPlayer += whoToKill;
+        LevelManager.OnRespaw += whoToRespawn;
+		CollectiablesController.OnItemCollect += itemCatch;
     }
 
     private void itemActived(bool actived, Global.typeOfPlayer player,
@@ -90,7 +95,7 @@ public class PlayerControl : MonoBehaviour {
 
                 invencivel = false;
             } else {
-                knockbackAction();
+                //knockbackAction();
             }
         } 
     }
@@ -100,6 +105,7 @@ public class PlayerControl : MonoBehaviour {
         isAtivo = false;
         meuRigibody = GetComponent<Rigidbody2D>();
         meuAnim = GetComponent<Animator>();
+        sprites = GetComponentsInChildren<SpriteRenderer>();
         respawnPosition = transform.position;
         
         executandoDano = false;
@@ -107,11 +113,12 @@ public class PlayerControl : MonoBehaviour {
         jogadorParando = true;
         meuRigibody.isKinematic = true;
         inPlataformaMovel = false;
-
+        contadorInvencibilidade = 0;
     }
 
     public void machucarJogador(int dano, Global.typeOfPlayer type) {
-        startKnockbackAction();
+        Debug.Log("Executando o OnHurt no PlayerControl");
+        // startKnockbackAction();
     }
 
     void FixedUpdate() {
@@ -176,6 +183,40 @@ public class PlayerControl : MonoBehaviour {
 				movimentar ();
 			}
 		}
+
+    }
+
+    private IEnumerator flashSprites(SpriteRenderer[] sprites, int seconds, bool disable = false) {
+        // number of times to loop
+        for (int loop = 0; loop < seconds*10; loop++) {
+            // cycle through all sprites
+            for (int i = 0; i < sprites.Length; i++) {
+                if (disable) {
+                    // for disabling
+                    sprites[i].enabled = false;
+                } else {
+                    // for changing the alpha
+                    sprites[i].color = new Color(sprites[i].color.r, sprites[i].color.g, sprites[i].color.b, 0.5f);
+                }
+            }
+
+            // delay specified amount
+            yield return new WaitForSeconds(0.05f);
+
+            // cycle through all sprites
+            for (int i = 0; i < sprites.Length; i++) {
+                if (disable) {
+                    // for disabling
+                    sprites[i].enabled = true;
+                } else {
+                    // for changing the alpha
+                    sprites[i].color = new Color(sprites[i].color.r, sprites[i].color.g, sprites[i].color.b, 1);
+                }
+            }
+
+            // delay specified amount
+            yield return new WaitForSeconds(0.05f);
+        }
     }
 
     public void startKnockbackAction() {
@@ -194,7 +235,9 @@ public class PlayerControl : MonoBehaviour {
     }
 
     private void congelarJogador() {
-        if ((isSwinning || isGrounded || isLavaGrounded) && !jogadorParando) {
+        if ((isSwinning || isGrounded || isLavaGrounded) 
+            && !jogadorParando && gameObject.activeSelf) {
+
 			meuRigibody.velocity = Vector3.zero;
 			StartCoroutine("PararJogador");
         }
@@ -218,43 +261,82 @@ public class PlayerControl : MonoBehaviour {
     }
 
     public void Respawn() {
-        //TIpo Thread
         StartCoroutine("RespawnCoRoutine");
     }
 
     public IEnumerator RespawnCoRoutine() {
-
-        gameObject.SetActive(false);
-
-        // Não funciona o objeto ja esta foi criado.
-        //explosao.GetComponent<ParticleSystem>().startColor = jogador_ativo.obterCorParaExplosaoMorte();
-
-        Instantiate(LevelManager.instance.explosao, transform.position, transform.rotation);
-
+        killPlayer();
         yield return new WaitForSeconds(LevelManager.instance.tempoEsperaRespawn);
-
-        //jogadorRespaw.Respawing(vidaMaxima);
-
         gameObject.SetActive(true);
-
         renascendo = false;
-
-        //UpdateCoracao ();
-
-        // Resetando as moedas e iniciando objetos;
-        /*
-        foreach (ResetOnRespawn objeto in objetosParaResetar) {
-            objeto.gameObject.SetActive(true);
-            objeto.ResetObject();
-        }
-        */
     }
 
-	public bool canSwitchPlayer(){
-		return (isSwinning || isGrounded || isLavaGrounded) && isAtivo;
+    private void killPlayer() {
+        isAtivo = false;
+        gameObject.SetActive(false);
+        Instantiate(LevelManager.instance.explosao, transform.position, transform.rotation);
+    }
+
+    private void whoToRespawn(Global.typeOfPlayer player) {
+        if (tipo.Equals(player)) {
+            Respawn();
+        }
+    }
+
+    private void whoToKill(Global.typeOfPlayer player) {
+        if (tipo.Equals(player)) {
+            killPlayer();
+        }
+    }
+
+    public bool canSwitchPlayer(bool forKill) {
+        if (forKill) {
+            return isAtivo;
+        } else { 
+            if (this.gameObject.activeSelf) {
+                return (isSwinning || isGrounded || isLavaGrounded) && isAtivo;
+            } else {
+                return false;
+            }
+        }
 	}
 
-    void OnTriggerEnter2D(Collider2D outro) {
+    public bool canBeNextPlayer() {
+        if (this.gameObject.activeSelf) {
+            return (isSwinning || isGrounded || isLavaGrounded || meuRigibody.isKinematic)  && !isAtivo;
+        } else {
+            return false;
+        }
+    }
+    private void itemCatch(int valueOfItem, Global.typeOfPlayer player, CollectiablesController item) {
+        if (Global.typeOfItem.Star.Equals(item.typeOfItem) && tipo.Equals(player)) {
+            Debug.Log("Pegou Estrela-->" + valueOfItem);
+            contadorInvencibilidade = valueOfItem;
+            Invoke("ContadorInvencibilidade", valueOfItem);
+            invencivel = true;
+            
+            StartCoroutine(flashSprites(sprites, valueOfItem));
+        }
+    }
+    public void ContadorInvencibilidade() {
+        Debug.Log("Normal" );
+        invencivel = false;
+    }
+        /*
+        private void itemCatch(int valueOfItem, Global.typeOfPlayer player, CollectiablesController item) {
+            if (Global.typeOfItem.Star.Equals(item.typeOfItem)) {
+                Debug.Log("Pegou Estrela-->" + valueOfItem);
+                contadorInvencibilidade = valueOfItem;
+                InvokeRepeating("ContadorInvencibilidade", 1f, 1f);
+            }
+        }
+
+        public void ContadorInvencibilidade() {
+            Debug.Log("Tempo Invencibilidade--> " + contadorInvencibilidade);
+            contadorInvencibilidade--; 
+        }
+        */
+        void OnTriggerEnter2D(Collider2D outro) {
         if (isAtivo) {
             if (outro.tag == "KillPlane") {
                 //gameObject.SetActive (false);
@@ -309,4 +391,8 @@ public class PlayerControl : MonoBehaviour {
         this.transform.position = new Vector3(posicaoPlataformaX + offsetX,
             posicaoPlataformaY + offsetY, 0f);
 	}
+
+    public bool isDead() {
+        return gameObject.activeSelf;
+    }
 }

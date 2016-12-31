@@ -8,7 +8,7 @@ public interface IPlayerAction {
 	void playSound(AudioSource sound,bool canPlay);
 
     bool changePlayer(List<PlayerControl> listOfPlayers);
-    void changedPlayer(Button buttonNextPlayer, Image imageCurrentPlayer);
+	void changedPlayer(List<PlayerControl> listOfPlayers,Button buttonNextPlayer, Image imageCurrentPlayer);
 }
 
 public interface IGameAction {

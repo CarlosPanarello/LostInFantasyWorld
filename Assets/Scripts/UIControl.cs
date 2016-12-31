@@ -70,22 +70,12 @@ public class UIControl : MonoBehaviour {
 
     public int quantidadeMoeda;
     public int quantidadeChaves;
-    //public int quantidadeGemas;
 
     private List<Image> listaCoracoes;
     private int hearths;
     private int currentHealth;
 
     private int currentCoin;
-
-    /*    
-        public Button botaoIrDireita;
-        public Button botaoIrEsquerda;
-        public Button botaoAcaoPular;
-        public Button botaoAcaoEspecial;
-        public Button botaoConfig;
-        public Button botaoSair;
-        */
 
     public Button botaoMudarJogador;
     public Button botaoPausaStart;
@@ -111,13 +101,13 @@ public class UIControl : MonoBehaviour {
 
 
     private void changedPlayer(IPlayerAction action,Global.typeOfPlayer type) {
-
-		setPlayerIcons(botaoMudarJogador,playerAtivo);
+		
+		action.changedPlayer(LevelManager.instance.listOfPlayers,botaoMudarJogador,playerAtivo);
 
 		hearths = ScoreController.instance.getHearthsFromPlayer(type);
 		currentHealth = ScoreController.instance.getCurrentHealthFromPlayer(type);
 		setQuantidadeCoracao(hearths);
-        updateHealthShow();
+        //updateHealthShow();
     }
 
     void MakeInstance() {
@@ -126,25 +116,7 @@ public class UIControl : MonoBehaviour {
         }
     }
 
-	private void setPlayerIcons(Button buttonNextPlayer, Image imageCurrentPlayer){
-		List<PlayerControl> listOfPlayersInternal = LevelManager.instance.listOfPlayers;
-		int indiceJogadorAtivo = 0;
-		foreach (PlayerControl jogador in listOfPlayersInternal) {
-			if (jogador.isAtivo) {
-				imageCurrentPlayer.sprite = jogador.spriteBotonFull;
-				break;
-			}
-			indiceJogadorAtivo++;
-		}
 
-		if (indiceJogadorAtivo >= listOfPlayersInternal.Count - 1) {
-			indiceJogadorAtivo = 0;
-		} else {
-			indiceJogadorAtivo++;
-		}
-
-		buttonNextPlayer.image.sprite = listOfPlayersInternal[indiceJogadorAtivo].spriteBotonCenter;
-	}
 
     private void setQuantidadeInicialMoedas(int qtdMoedas) {
         currentCoin = qtdMoedas;
@@ -153,8 +125,7 @@ public class UIControl : MonoBehaviour {
 
     private void setQuantidadeCoracao(int fullHearts) {
         hearths = fullHearts;
-        //cada coração possui 2 divisoes
-        currentHealth = fullHearts * 2;
+
 		bool isCoracaoAtivo = true;
 
 		for (int cont = 1; cont <= 10; cont++) {
@@ -223,7 +194,8 @@ public class UIControl : MonoBehaviour {
     void Start() {
 		inicializarItens();
 		carregarValoresInicias (LevelManager.instance.getTypeActivePlayer ());
-		setPlayerIcons (botaoMudarJogador,playerAtivo);
+		ActionChangePlayer action = new ActionChangePlayer (false);
+		action.changedPlayer(LevelManager.instance.listOfPlayers,botaoMudarJogador,playerAtivo);
     }
 
     //Metodos Privados
@@ -315,6 +287,7 @@ public class UIControl : MonoBehaviour {
 		setQuantidadeInicialMoedas (quantidadeMoeda);
 
 		if (!Global.typeOfPlayer.Player_None.Equals (tipo)) {
+			currentHealth = ScoreController.instance.getCurrentHealthFromPlayer(tipo);
 			setQuantidadeCoracao (ScoreController.instance.getHearthsFromPlayer(tipo));
 		}
 	}
@@ -325,6 +298,7 @@ public class UIControl : MonoBehaviour {
     }
 
     private void updateHearthDamage(int dano, Global.typeOfPlayer type) {
+        Debug.Log("Executando o OnHurt no UIControl");
         currentHealth -= dano;
         updateHealthShow();
     }

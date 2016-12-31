@@ -15,7 +15,6 @@ public class ScoreController : MonoBehaviour {
     private Dictionary<Global.typeOfPlayer, int> currentHealth ;
 	private Dictionary<Global.typeOfPlayer, int> currentCoinsByPlayer;
 
-    private int initialCoins;
     private int totalCurrentCoins;
     public int maxHealthOfGreen;
     public int maxHealthOfBege;
@@ -58,7 +57,8 @@ public class ScoreController : MonoBehaviour {
     }
 
     private void initializeLists() {
-		maxHealth = new Dictionary<Global.typeOfPlayer, int>();
+        //initialCoins = 0;
+        maxHealth = new Dictionary<Global.typeOfPlayer, int>();
 		currentHealth = new Dictionary<Global.typeOfPlayer, int>();
 		itens = new Dictionary<Global.typeOfItem, bool>();
 		currentCoinsByPlayer = new Dictionary<Global.typeOfPlayer, int>();
@@ -143,13 +143,16 @@ public class ScoreController : MonoBehaviour {
     }
 
     private void updateHealth(int damage, Global.typeOfPlayer player) {
+        Debug.Log("Executando o OnHurt no ScoreController");
         switch (player) {
             case Global.typeOfPlayer.Player_None:
                 return;
             default:
                 currentHealth[player] -= damage;
+                Debug.Log("Life " + player.ToString() + " ->" + currentHealth[player]);
                 if (currentHealth[player] <= 0) {
                     if (OnHealthGoesToZero != null) {
+                        Debug.Log("Player->" + player.ToString() + " morreu executando OnHealthGoesToZero");
                         OnHealthGoesToZero(player);
                     }
                 }

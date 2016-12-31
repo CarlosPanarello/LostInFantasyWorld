@@ -56,6 +56,7 @@ public class Global {
         Health_half,
         Health_empty,
         Gold_Coin,
+		Star,
         Item_None
     }
 

@@ -46,22 +46,27 @@ public class SoundController : MonoBehaviour {
     private void actionController(IPlayerAction action) {
 		if (action.GetType () == typeof(ActionJump)) {
 			PlayerControl player = LevelManager.instance.getActivePlayer ();
+            Global.typeOfPlayer tipoPlayer = Global.typeOfPlayer.Player_None;
+                
+            if (player != null) {
+                tipoPlayer = player.tipo;
+            }
 
-			switch (player.tipo) {
+			switch (tipoPlayer) {
 			case Global.typeOfPlayer.Player_Bege:
-				action.playSound (playerJumpBege,player.isGrounded);
+				action.playSound (playerJumpBege,player.isGrounded && player.isAtivo);
 				break;
 			case Global.typeOfPlayer.Player_Blue:
-				action.playSound (playerJumpBlue,player.isGrounded);
+				action.playSound (playerJumpBlue,player.isGrounded && player.isAtivo);
 				break;
 			case Global.typeOfPlayer.Player_Green:
-				action.playSound (playerJumpGreen,player.isGrounded);
+				action.playSound (playerJumpGreen,player.isGrounded && player.isAtivo);
 				break;
 			case Global.typeOfPlayer.Player_Pink:
-				action.playSound (playerJumpPink,player.isGrounded);
+				action.playSound (playerJumpPink,player.isGrounded && player.isAtivo);
 				break;
 			case Global.typeOfPlayer.Player_Yellow:
-				action.playSound (playerJumpYellow,player.isGrounded);
+				action.playSound (playerJumpYellow,player.isGrounded && player.isAtivo);
 				break;
 			default:
 				break;
@@ -100,6 +105,7 @@ public class SoundController : MonoBehaviour {
         }
     }
     private void soundPlayerHurt(int damage, Global.typeOfPlayer player) {
+        Debug.Log("Executando o OnHurt no SoundController");
         switch (player) {
             case Global.typeOfPlayer.Player_Bege:
                 hurtBege.Play();

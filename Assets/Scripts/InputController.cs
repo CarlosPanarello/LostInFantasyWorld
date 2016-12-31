@@ -3,12 +3,24 @@ using System.Collections;
 
 public class InputController : MonoBehaviour {
 
+    public static InputController instance;
+
     public delegate void GameActions(IGameAction action);
     public static event GameActions OnGameAction;
 
     public delegate void PlayersActions(IPlayerAction action);
     public static event PlayersActions OnPlayerAction;
-    // Use this for initialization
+
+    void MakeInstance() {
+        if (instance == null) {
+            instance = this;
+        }
+    }
+
+    void Awake() {
+        MakeInstance();
+    }
+        // Use this for initialization
     void Start () {
 	
 	}
@@ -17,7 +29,7 @@ public class InputController : MonoBehaviour {
     void Update() {
         //Selecão do jogador
         if (Input.GetButtonDown("Fire3")) {
-            changePlayer();
+            changePlayer(false);
         }
 
         //Acao Especial (Nadar,Atirar, Bomba etc)
@@ -80,9 +92,10 @@ public class InputController : MonoBehaviour {
         }
     }
 
-    public void changePlayer() {
+    public void changePlayer(bool isForKillPlayer) {
         if (OnPlayerAction != null) {
-            OnPlayerAction(new ActionChangePlayer());
+            Debug.Log("Trocando Jogador");
+            OnPlayerAction(new ActionChangePlayer(isForKillPlayer));
         }
     }
 

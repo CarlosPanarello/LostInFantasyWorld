@@ -36,6 +36,7 @@ public class HurtPlayer : MonoBehaviour {
                 default:
                     //Será que isso eh perfomatico?
                     if (canHurt(outro.GetComponent<PlayerControl>())) {
+                        Debug.Log("Executando Dano, Chamando todos os Eventos");
                         OnHurtPlayer(damage, tipo);
                     }
                     break;

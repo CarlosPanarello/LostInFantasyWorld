@@ -23,14 +23,19 @@ public class LevelManager : MonoBehaviour {
 	public GameObject explosao;
 
     //Novos Metodos
+    private int qtdMortos = 0;
     public bool canRespaw;
     public List<PlayerControl> listOfPlayers;
-    
+    public List<PlayerControl> listOfPlayersDesativados;
+
     public delegate void LevelActions(IPlayerAction action,Global.typeOfPlayer tipoPlayer);
     public static event LevelActions OnLevelAction;
 
     public delegate void LevelPlayerRespaw(Global.typeOfPlayer player);
     public static event LevelPlayerRespaw OnRespaw;
+
+    public delegate void LevelPlayerKill(Global.typeOfPlayer player);
+    public static event LevelPlayerKill OnKillPlayer;
 
     void MakeInstance() {
         if (instance == null) {
@@ -45,12 +50,21 @@ public class LevelManager : MonoBehaviour {
     }
 
     private void playerDies(Global.typeOfPlayer player) {
+        Debug.Log("Executando o OnHealthGoesToZero no LevelManager");
         if (OnRespaw != null) { 
             foreach (PlayerControl scriptPlayer in listOfPlayers) {
                 if (scriptPlayer.tipo.Equals(player)) {
 
                     if (canRespaw) {
                         OnRespaw(player);
+                    } else {
+                        InputController.instance.changePlayer(true);
+                        OnKillPlayer(player);
+                        qtdMortos++;
+						Debug.Log("Jogador Morreu--> " + player.ToString() + " Posicao->"  + qtdMortos );
+                        if (qtdMortos == listOfPlayers.Count) {
+                            Debug.Log("GAME OVER");
+                        }
                     }
                 }
             }
@@ -69,7 +83,7 @@ public class LevelManager : MonoBehaviour {
             }
 
             if (OnLevelAction != null) { 
-                OnLevelAction(new ActionChangePlayer(),type);
+				OnLevelAction(action,type);
             }
         }
     }
@@ -80,7 +94,8 @@ public class LevelManager : MonoBehaviour {
 
     private void inicializarListaJogaresPossiveis() {
         listOfPlayers = new List<PlayerControl>(5);
-		PlayerControl playerActive = getActivePlayer ();
+        listOfPlayersDesativados = new List<PlayerControl>(1);
+        PlayerControl playerActive = getActivePlayer ();
 
         if(jogador_Green != null) {
             if (playerActive == null) {
@@ -89,7 +104,7 @@ public class LevelManager : MonoBehaviour {
             }else {
                 jogador_Green.desativarJogador();
             }
-
+			jogador_Green.isGrounded = true;
             listOfPlayers.Add(jogador_Green);
         }
         if (jogador_Bege != null) {
@@ -99,7 +114,7 @@ public class LevelManager : MonoBehaviour {
             } else {
                 jogador_Bege.desativarJogador();
             }
-
+			jogador_Bege.isGrounded = true;
             listOfPlayers.Add(jogador_Bege);
         }
         if (jogador_Blue != null) {
@@ -109,6 +124,7 @@ public class LevelManager : MonoBehaviour {
             } else {
                 jogador_Blue.desativarJogador();
             }
+			jogador_Blue.isGrounded = true;
 
             listOfPlayers.Add(jogador_Blue);
         }
@@ -119,6 +135,7 @@ public class LevelManager : MonoBehaviour {
             } else {
                 jogador_Pink.desativarJogador();
             }
+			jogador_Pink.isGrounded = true;
 
             listOfPlayers.Add(jogador_Pink);
         }
@@ -129,6 +146,7 @@ public class LevelManager : MonoBehaviour {
             } else {
                 jogador_Yellow.desativarJogador();
             }
+			jogador_Yellow.isGrounded = true;
 
             listOfPlayers.Add(jogador_Yellow);
         }
@@ -137,18 +155,7 @@ public class LevelManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        /*
-        foreach (PlayerControl player in listOfPlayers) {
-            if (player.contadorVida <= 0 && !player.renascendo) {
-                player.renascendo = true;
-                Respawn(player);
-            }
-        }
-        */
-
 	}
-
-
 
     public Vector3 posicaoJogadorAtivo() {
 		return getActivePlayer().transform.position;
